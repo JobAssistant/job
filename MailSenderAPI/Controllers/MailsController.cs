@@ -11,11 +11,18 @@ namespace MailSenderAPI.Controllers
    [Route("api/[controller]")]
    public class MailsController : Controller
    {
+      
+
       // GET: api/<controller>
       [HttpGet]
-      public IEnumerable<string> Get()
+      public IEnumerable<Mails> Get()
       {
-         return new string[] { "value1", "value2" };
+         return Enumerable.Range(1, 1).Select(i => new Mails
+         {
+            subject = "testsubject",
+            body = "testbody",
+            recipients = new []{"test1","test2"}
+         });
       }
 
       // GET api/<controller>/5
@@ -25,11 +32,17 @@ namespace MailSenderAPI.Controllers
          return "value";
       }
 
+      // Данные для теста
+      // {"subject":"testsubject","body":"testbody","recipients":["test1","test2"]}
       // POST api/<controller>
       [HttpPost]
-      public void Post([FromBody]string value)
+      public void Post([FromBody]Mails value)
       {
-
+         Mails t = value;
+         // Сформировать email сообщение
+         // выполнить его отправку
+         // Добавить запись в БД
+         // поля Result: (значения Ok, Failed), а также поле FailedMessage
       }
 
       // PUT api/<controller>/5
