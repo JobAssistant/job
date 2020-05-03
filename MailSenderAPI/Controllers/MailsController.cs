@@ -2,59 +2,117 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.EntityFrameworkCore;
+using MailSenderAPI.Models;
 
 namespace MailSenderAPI.Controllers
 {
    [Route("api/[controller]")]
-   public class MailsController : Controller
+   [ApiController]
+   public class MailsController : ControllerBase
    {
-      
+      private readonly MailsContext _context;
 
-      // GET: api/<controller>
+      public MailsController(MailsContext context)
+      {
+         _context = context;
+      }
+
+      // GET: api/Mails1
       [HttpGet]
-      public IEnumerable<Mails> Get()
+      public async Task<ActionResult<IEnumerable<Mails>>> GetMails()
       {
-         return Enumerable.Range(1, 1).Select(i => new Mails
-         {
-            subject = "testsubject",
-            body = "testbody",
-            recipients = new []{"test1","test2"}
-         });
+         return await _context.Mails.ToListAsync();
       }
 
-      // GET api/<controller>/5
+      // GET: api/Mails1/5
       [HttpGet("{id}")]
-      public string Get(int id)
+      public async Task<ActionResult<Mails>> GetMails(int id)
       {
-         return "value";
+         var mails = await _context.Mails.FindAsync(id);
+
+         if (mails == null)
+         {
+            return NotFound();
+         }
+
+         return mails;
       }
 
-      // Данные для теста
-      // {"subject":"testsubject","body":"testbody","recipients":["test1","test2"]}
-      // POST api/<controller>
-      [HttpPost]
-      public void Post([FromBody]Mails value)
-      {
-         Mails t = value;
-         // Сформировать email сообщение
-         // выполнить его отправку
-         // Добавить запись в БД
-         // поля Result: (значения Ok, Failed), а также поле FailedMessage
-      }
-
-      // PUT api/<controller>/5
+      // PUT: api/Mails1/5
+      // To protect from overposting attacks, enable the specific properties you want to bind to, for
+      // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
       [HttpPut("{id}")]
-      public void Put(int id, [FromBody]string value)
+      public async Task<IActionResult> PutMails(int id, Mails mails)
       {
+         if (id != mails.Id)
+         {
+            return BadRequest();
+         }
+
+         _context.Entry(mails).State = EntityState.Modified;
+
+         try
+         {
+            await _context.SaveChangesAsync();
+         }
+         catch (DbUpdateConcurrencyException)
+         {
+            if (!MailsExists(id))
+            {
+               return NotFound();
+            } else
+            {
+               throw;
+            }
+         }
+
+         return NoContent();
       }
 
-      // DELETE api/<controller>/5
-      [HttpDelete("{id}")]
-      public void Delete(int id)
+      // POST: api/Mails1
+      // To protect from overposting attacks, enable the specific properties you want to bind to, for
+      // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+      [HttpPost]
+      public async Task<ActionResult<Mails>> PostMails(Mails mails)
       {
+         var mail = new Mails
+         {
+            Subject = mails.Subject,
+            Body = mails.Body,
+            Recipients = mails.Recipients,
+            Datecreate = DateTime.Now
+         };
+
+         _context.Mails.Add(mail);
+         await _context.SaveChangesAsync();
+
+         //return CreatedAtAction(nameof(GetMails), new { id = mails.Id }, Mails(mail));
+
+         return CreatedAtAction(nameof(GetMails), new { id = mails.Id }, mails);
+      }
+
+      // DELETE: api/Mails1/5
+      [HttpDelete("{id}")]
+      public async Task<ActionResult<Mails>> DeleteMails(int id)
+      {
+         var mails = await _context.Mails.FindAsync(id);
+         if (mails == null)
+         {
+            return NotFound();
+         }
+
+         _context.Mails.Remove(mails);
+         await _context.SaveChangesAsync();
+
+         return mails;
+      }
+
+      private bool MailsExists(int id)
+      {
+         return _context.Mails.Any(e => e.Id == id);
       }
    }
 }

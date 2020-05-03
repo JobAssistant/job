@@ -1,6 +1,6 @@
 ﻿namespace MailSenderAPI
 {
-   public class Mails
+   public class MailsEnum
    {
       public string subject { get; set; }
       public string body { get; set; }
