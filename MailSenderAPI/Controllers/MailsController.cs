@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -85,6 +87,24 @@ namespace MailSenderAPI.Controllers
             Recipients = mails.Recipients,
             Datecreate = DateTime.Now
          };
+         // Отправка почты
+         MailAddress fromAddress = new MailAddress("xoste49@gmail.com", "Павел");
+         MailMessage message = new MailMessage();
+         message.From = fromAddress;
+         // Добавление адресатов
+         foreach (var address in mail.Recipients)
+         {
+            message.To.Add(address);
+         }
+         message.Subject = mail.Subject;
+         message.Body = mail.Body;
+         // Создаем подключение smtp клиента
+         SmtpClient client = new SmtpClient("smtp.gmail.com", 587)
+         {
+            Credentials = new NetworkCredential("xoste49@gmail.com", ""),
+            EnableSsl = true
+         };
+         client.Send(message);
 
          _context.Mails.Add(mail);
          await _context.SaveChangesAsync();
