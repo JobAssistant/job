@@ -28,6 +28,9 @@ namespace MailSenderAPI
       {
          services.AddControllers();
          services.AddDbContext<MailsContext>();
+         services.AddOptions();
+         services.Configure<Config>(Configuration.GetSection("Smtp"));
+         services.AddSingleton<IConfiguration>(Configuration);
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

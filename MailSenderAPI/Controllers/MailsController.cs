@@ -5,12 +5,15 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Configuration;
 using MailKit;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MailSenderAPI.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 using SmtpStatusCode = MailKit.Net.Smtp.SmtpStatusCode;
@@ -22,11 +25,15 @@ namespace MailSenderAPI.Controllers
    public class MailsController : ControllerBase
    {
       private readonly MailsContext _context;
+      private Config config { get; set; }
 
-      public MailsController(MailsContext context)
+      public MailsController(MailsContext context, IOptions<Config> settings)
       {
          _context = context;
+         config = settings.Value;
       }
+
+      
 
       // GET: api/Mails1
       [HttpGet]
@@ -110,7 +117,7 @@ namespace MailSenderAPI.Controllers
          try
          {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("xoste49@gmail.com"));
+            emailMessage.From.Add(new MailboxAddress(config.MailAddress));
             // Добавление адресатов
             foreach (var address in mail.Recipients)
             {
@@ -123,10 +130,9 @@ namespace MailSenderAPI.Controllers
                Text = mail.Body
             };
 
-            //SmtpResponse response = new SmtpResponse();
             var client = new SmtpClient();
-            client.Connect("smtp.gmail.com", 465, true);
-            client.Authenticate("xoste49@gmail.com", "tmdjuhvzeacjulqp");
+            client.Connect(config.Host, config.Port, config.UseSsl);
+            client.Authenticate(config.UserName, config.Password);
             client.MessageSent += (sender, args) => mail.Result = "OK";
             client.Send(emailMessage);
             client.Disconnect(true);

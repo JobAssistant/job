@@ -18,6 +18,12 @@ namespace MailSenderAPI
 
       public static IHostBuilder CreateHostBuilder(string[] args) =>
           Host.CreateDefaultBuilder(args)
+             .ConfigureAppConfiguration((hostingContext, config) =>
+             {
+                config.Sources.Clear();
+
+                config.AddIniFile("config.ini", optional: true, reloadOnChange: true);
+             })
               .ConfigureWebHostDefaults(webBuilder =>
               {
                  webBuilder.UseStartup<Startup>();
