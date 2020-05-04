@@ -99,11 +99,6 @@ namespace MailSenderAPI.Controllers
       [HttpPost]
       public async Task<ActionResult<Mails>> PostMails(Mails mails)
       {
-         // Результат
-         string result = null;
-         // Сообщение об ошибке
-         string failedMessage = null;
-
          var mail = new Mails
          {
             Subject = mails.Subject,
@@ -132,59 +127,50 @@ namespace MailSenderAPI.Controllers
             var client = new SmtpClient();
             client.Connect("smtp.gmail.com", 465, true);
             client.Authenticate("xoste49@gmail.com", "tmdjuhvzeacjulqp");
-            client.MessageSent += (sender, args) => result = "OK";
+            client.MessageSent += (sender, args) => mail.Result = "OK";
             client.Send(emailMessage);
             client.Disconnect(true);
 
             
          }
-         catch (SmtpException e)
-         {
-            result = "Failed";
-            failedMessage = e.Message;
-         }
          // При отсутствии хоста или не верном порте
          catch (System.Net.Sockets.SocketException e)
          {
-            result = "Failed";
-            failedMessage = e.Message;
+            mail.Result = "Failed";
+            mail.Failedmessage = e.Message;
          }
          catch (SmtpCommandException ex)
          {
-            result = "Failed";
-            failedMessage = $"Error trying to connect: {ex.Message} StatusCode: {ex.StatusCode}";
+            mail.Result = "Failed";
+            mail.Failedmessage = $"Error trying to connect: {ex.Message} StatusCode: {ex.StatusCode}";
          }
          catch (SmtpProtocolException ex)
          {
-            result = "Failed";
-            failedMessage = $"Protocol error while trying to connect: {ex.Message}";
+            mail.Result = "Failed";
+            mail.Failedmessage = $"Protocol error while trying to connect: {ex.Message}";
          }
          // При проблеме с ssl сертификатом
          catch (MailKit.Security.SslHandshakeException e)
          {
-            result = "Failed";
-            failedMessage = "Не верный ssl сертификат или не правильный порт";
-            //return Content(e.ToString());
+            mail.Result = "Failed";
+            mail.Failedmessage = "Не верный ssl сертификат или не правильный порт";
          }
          // Проблема с логином или паролем
          catch (MailKit.Security.AuthenticationException e)
          {
-            result = "Failed";
-            failedMessage = "Invalid user name or password.";
-            //return Content(e.ToString());
+            mail.Result = "Failed";
+            mail.Failedmessage = "Invalid user name or password.";
          }
          catch (Exception e)
          {
-            //return Content(e.ToString());
+            mail.Result = "Failed";
+            mail.Failedmessage = e.Message;
          }
 
-
-         mail.Result = result;
-         if(failedMessage != null) mail.Failedmessage = failedMessage; 
          _context.Mails.Add(mail);
          await _context.SaveChangesAsync();
 
-         return CreatedAtAction(nameof(GetMails), new { id = mails.Id }, mails);
+         return CreatedAtAction(nameof(GetMails), new { id = mails.Id }, mail);
       }
 
       // DELETE: api/Mails1/5
