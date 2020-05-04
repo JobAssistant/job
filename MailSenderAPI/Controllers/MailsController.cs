@@ -25,12 +25,12 @@ namespace MailSenderAPI.Controllers
    public class MailsController : ControllerBase
    {
       private readonly MailsContext _context;
-      private Config config { get; set; }
+      private ConfigSmtp configSmtp { get; set; }
 
-      public MailsController(MailsContext context, IOptions<Config> settings)
+      public MailsController(MailsContext context, IOptions<ConfigSmtp> smtpOptions)
       {
          _context = context;
-         config = settings.Value;
+         configSmtp = smtpOptions.Value;
       }
 
       
@@ -117,7 +117,7 @@ namespace MailSenderAPI.Controllers
          try
          {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress(config.MailAddress));
+            emailMessage.From.Add(new MailboxAddress(configSmtp.MailAddress));
             // Добавление адресатов
             foreach (var address in mail.Recipients)
             {
@@ -131,8 +131,8 @@ namespace MailSenderAPI.Controllers
             };
 
             var client = new SmtpClient();
-            client.Connect(config.Host, config.Port, config.UseSsl);
-            client.Authenticate(config.UserName, config.Password);
+            client.Connect(configSmtp.Host, configSmtp.Port, configSmtp.UseSsl);
+            client.Authenticate(configSmtp.UserName, configSmtp.Password);
             client.MessageSent += (sender, args) => mail.Result = "OK";
             client.Send(emailMessage);
             client.Disconnect(true);

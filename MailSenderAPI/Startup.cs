@@ -29,7 +29,8 @@ namespace MailSenderAPI
          services.AddControllers();
          services.AddDbContext<MailsContext>();
          services.AddOptions();
-         services.Configure<Config>(Configuration.GetSection("Smtp"));
+         services.Configure<ConfigSmtp>(Configuration.GetSection("SMTP"));
+         services.Configure<ConfigMySQL>(Configuration.GetSection("MySQL"));
          services.AddSingleton<IConfiguration>(Configuration);
       }
 

@@ -1,28 +1,33 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Options;
 
 namespace MailSenderAPI.Models
 {
    public partial class MailsContext : DbContext
    {
+      private ConfigMySQL configMySql { get; set; }
+
       public MailsContext()
       {
       }
 
-      public MailsContext(DbContextOptions<MailsContext> options)
+      public MailsContext(DbContextOptions<MailsContext> options, IOptions<ConfigMySQL> mysqlOptions)
           : base(options)
       {
+         configMySql = mysqlOptions.Value;
       }
 
       public virtual DbSet<Mails> Mails { get; set; }
 
       protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
       {
+         
          if (!optionsBuilder.IsConfigured)
          {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-            optionsBuilder.UseMySql("server=127.0.0.1;database=db;uid=root;pwd=123456", x => x.ServerVersion("8.0.20-mysql"));
+            optionsBuilder.UseMySql($"server={configMySql.server};database={configMySql.database};uid={configMySql.user};pwd={configMySql.password}", x => x.ServerVersion("8.0.20-mysql"));
          }
       }
 

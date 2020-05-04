@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MailSenderAPI
 {
-   public class Config
+   public class ConfigSmtp
    {
       public string Host { get; set; }
       public int Port { get; set; }
