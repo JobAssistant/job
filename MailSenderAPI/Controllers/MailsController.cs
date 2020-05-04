@@ -106,14 +106,7 @@ namespace MailSenderAPI.Controllers
       [HttpPost]
       public async Task<ActionResult<Mails>> PostMails(Mails mails)
       {
-         // Формируем сообщение из полученных данных
-         //var mail = new Mails
-         //{
-         //   Subject = mails.Subject,
-         //   Body = mails.Body,
-         //   Recipients = mails.Recipients,
-         //   Datecreate = DateTime.Now
-         //};
+         // Добавление даты создания письма
          mails.Datecreate = DateTime.Now;
          // Отправка почты
          try
