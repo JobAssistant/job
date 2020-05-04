@@ -14,6 +14,7 @@ namespace MailSenderAPI.Models
       
       public DateTime Datecreate { get; set; }
       public string Result { get; set; }
+      public string Failedmessage { get; set; }
 
       [NotMapped]
       public string[] Recipients

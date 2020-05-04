@@ -36,7 +36,7 @@ namespace MailSenderAPI.Models
 
             entity.Property(e => e.Body)
                    .HasColumnName("body")
-                   .HasColumnType("varchar(45)")
+                   .HasColumnType("text")
                    .HasCharSet("utf8")
                    .HasCollation("utf8_general_ci");
 
@@ -44,26 +44,33 @@ namespace MailSenderAPI.Models
                    .HasColumnName("datecreate")
                    .HasColumnType("datetime");
 
-               //entity.Property(e => e.Recipients)
-               //    .HasColumnName("recipients")
-               //    .HasColumnType("varchar(45)")
-               //    .HasCharSet("utf8")
-               //    .HasCollation("utf8_general_ci");
+            //entity.Property(e => e.Recipients)
+            //    .HasColumnName("recipients")
+            //    .HasColumnType("varchar(45)")
+            //    .HasCharSet("utf8")
+            //    .HasCollation("utf8_general_ci");
 
-               entity.Property(e => e.Result)
-                   .HasColumnName("result")
-                   .HasColumnType("varchar(45)")
-                   .HasCharSet("utf8")
-                   .HasCollation("utf8_general_ci");
+            entity.Property(e => e.Result)
+                .HasColumnName("result")
+                .HasColumnType("varchar(45)")
+                .HasCharSet("utf8")
+                .HasCollation("utf8_general_ci");
 
             entity.Property(e => e.Subject)
                    .HasColumnName("subject")
-                   .HasColumnType("varchar(45)")
+                   .HasColumnType("varchar(250)")
                    .HasCharSet("utf8")
                    .HasCollation("utf8_general_ci");
+
+            entity.Property(e => e.Failedmessage)
+               .HasColumnName("failedmessage")
+               .HasColumnType("varchar(1000)")
+               .HasCharSet("utf8")
+               .HasCollation("utf8_general_ci");
+
             entity.Property<string>("_recipients")
                   .HasColumnName("recipients")
-                  .HasColumnType("varchar(45)")
+                  .HasColumnType("varchar(250)")
                   .HasCharSet("utf8")
                   .HasCollation("utf8_general_ci");
          });
