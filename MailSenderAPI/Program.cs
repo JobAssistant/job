@@ -21,7 +21,7 @@ namespace MailSenderAPI
              .ConfigureAppConfiguration((hostingContext, config) =>
              {
                 config.Sources.Clear();
-
+                
                 config.AddIniFile("config.ini", optional: true, reloadOnChange: true);
              })
               .ConfigureWebHostDefaults(webBuilder =>

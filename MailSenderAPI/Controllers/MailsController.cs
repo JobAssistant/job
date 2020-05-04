@@ -106,78 +106,80 @@ namespace MailSenderAPI.Controllers
       [HttpPost]
       public async Task<ActionResult<Mails>> PostMails(Mails mails)
       {
-         var mail = new Mails
-         {
-            Subject = mails.Subject,
-            Body = mails.Body,
-            Recipients = mails.Recipients,
-            Datecreate = DateTime.Now
-         };
+         // Формируем сообщение из полученных данных
+         //var mail = new Mails
+         //{
+         //   Subject = mails.Subject,
+         //   Body = mails.Body,
+         //   Recipients = mails.Recipients,
+         //   Datecreate = DateTime.Now
+         //};
+         mails.Datecreate = DateTime.Now;
          // Отправка почты
          try
          {
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(configSmtp.MailAddress));
             // Добавление адресатов
-            foreach (var address in mail.Recipients)
+            foreach (var address in mails.Recipients)
             {
                emailMessage.To.Add(new MailboxAddress(address));
             }
 
-            emailMessage.Subject = mail.Subject;
+            emailMessage.Subject = mails.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
             {
-               Text = mail.Body
+               Text = mails.Body
             };
 
-            var client = new SmtpClient();
+            using var client = new SmtpClient();
             client.Connect(configSmtp.Host, configSmtp.Port, configSmtp.UseSsl);
             client.Authenticate(configSmtp.UserName, configSmtp.Password);
-            client.MessageSent += (sender, args) => mail.Result = "OK";
+            client.MessageSent += (sender, args) => mails.Result = "OK";
             client.Send(emailMessage);
             client.Disconnect(true);
-
-            
          }
          // При отсутствии хоста или не верном порте
          catch (System.Net.Sockets.SocketException e)
          {
-            mail.Result = "Failed";
-            mail.Failedmessage = e.Message;
+            mails.Result = "Failed";
+            mails.Failedmessage = e.Message;
          }
          catch (SmtpCommandException ex)
          {
-            mail.Result = "Failed";
-            mail.Failedmessage = $"Error trying to connect: {ex.Message} StatusCode: {ex.StatusCode}";
+            mails.Result = "Failed";
+            mails.Failedmessage = $"Error trying to connect: {ex.Message} StatusCode: {ex.StatusCode}";
          }
          catch (SmtpProtocolException ex)
          {
-            mail.Result = "Failed";
-            mail.Failedmessage = $"Protocol error while trying to connect: {ex.Message}";
+            mails.Result = "Failed";
+            mails.Failedmessage = $"Protocol error while trying to connect: {ex.Message}";
          }
          // При проблеме с ssl сертификатом
          catch (MailKit.Security.SslHandshakeException e)
          {
-            mail.Result = "Failed";
-            mail.Failedmessage = "Не верный ssl сертификат или не правильный порт";
+            mails.Result = "Failed";
+            mails.Failedmessage = "Не верный ssl сертификат или не правильный порт";
          }
          // Проблема с логином или паролем
          catch (MailKit.Security.AuthenticationException e)
          {
-            mail.Result = "Failed";
-            mail.Failedmessage = "Invalid user name or password.";
+            mails.Result = "Failed";
+            mails.Failedmessage = "Invalid user name or password.";
          }
          catch (Exception e)
          {
-            mail.Result = "Failed";
-            mail.Failedmessage = e.Message;
+            mails.Result = "Failed";
+            mails.Failedmessage = e.Message;
          }
 
-         _context.Mails.Add(mail);
+         _context.Mails.Add(mails);
          await _context.SaveChangesAsync();
 
-         return CreatedAtAction(nameof(GetMails), new { id = mails.Id }, mail);
+         return CreatedAtAction(nameof(GetMails), new { id = mails.Id }, mails);
       }
+
+
 
       // DELETE: api/Mails1/5
       [HttpDelete("{id}")]

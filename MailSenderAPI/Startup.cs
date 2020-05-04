@@ -28,6 +28,7 @@ namespace MailSenderAPI
       {
          services.AddControllers();
          services.AddDbContext<MailsContext>();
+         // Добавление поддержки файлов конфигураций
          services.AddOptions();
          services.Configure<ConfigSmtp>(Configuration.GetSection("SMTP"));
          services.Configure<ConfigMySQL>(Configuration.GetSection("MySQL"));
