@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MailSenderAPI.Models
 {
-   public partial class Mails
+   public class Mails
    {
 
       private static readonly char delimiter = ';';
